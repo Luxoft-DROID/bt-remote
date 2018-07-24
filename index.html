@@ -101,6 +101,7 @@
           <div class="card-content">
             <paper-toggle-button class="blue" id="connect">Connect</paper-toggle-button>
             <paper-progress id="progress" indeterminate></paper-progress>
+            <paper-slider max="250" id="speed" pin value="0"></paper-slider>
           </div>
         </paper-card>
 
@@ -145,6 +146,7 @@
       'use strict';
       document.addEventListener('WebComponentsReady', () => {
         let connectToggle = document.querySelector('#connect');
+        let speedSlider = document.querySelector('#speed');
         let progress = document.querySelector('#progress');
         let dialog = document.querySelector('#dialog');
         let message = document.querySelector('#message');
@@ -155,6 +157,7 @@
         let controlCharacteristic;
         let sequence = 0;
         let heading = 0;
+        let speed = 0;
         let busy = false;
         progress.hidden = true;
 
@@ -224,8 +227,8 @@
           .catch(handleError);
         }
 
-        function roll(heading) {
-          console.log('Roll heading='+heading);
+        function roll(heading, speed) {
+          console.log('Roll ='+heading + " ("+ speed +")");
           if (busy) {
             // Return if another operation pending
             return Promise.resolve();
@@ -234,7 +237,7 @@
           let did = 0x02; // Virtual device ID
           let cid = 0x30; // Roll command
           // Roll command data: speed, heading (MSB), heading (LSB), state
-          let data = new Uint8Array([10, heading >> 8, heading & 0xFF, 1]);
+          let data = new Uint8Array([speed, heading >> 8, heading & 0xFF, 1]);
 
           sendCommand(did, cid, data).then(() => {
             busy = false;
@@ -242,6 +245,11 @@
           .catch(handleError);
         }
 
+        speedSlider.addEventListener('change', function(e) {
+            
+          speed = e.srcElement.value;
+          });
+          
         connectToggle.addEventListener('click', () => {
           progress.hidden = false;
           // Can only send commands once device is in developer mode.
@@ -287,7 +295,7 @@
           retroStickElement: document.querySelector('#retrostick')
         });
         joystick.subscribe('change', stick => {
-          roll(stick.angle);
+          roll(stick.angle, speed);
         });
       });
     </script>
