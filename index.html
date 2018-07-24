@@ -247,10 +247,7 @@
           if (controlCharacteristic == null) {
             navigator.bluetooth.requestDevice({
               filters: [{
-                services: ['22bb746f-2bb0-7554-2d6f-726568705327']
-              }, {
-                // Some BB8 toys advertise -2ba0- instead of -2bb0-.
-                services: ['22bb746f-2ba0-7554-2d6f-726568705327']
+                services: ['0xFFE0']
               }]
             })
             .then(device => {
@@ -261,7 +258,7 @@
             .then(server => {
               gattServer = server;
               // Get radio service
-              return gattServer.getPrimaryService("22bb746f-2bb0-7554-2d6f-726568705327");
+              return gattServer.getPrimaryService("0xFFE0");
             })
             .then(service => {
               // Developer mode sequence is sent to the radio service
@@ -279,7 +276,7 @@
             })
             .then(() => {
               // Get TX Power characteristic
-              return radioService.getCharacteristic("22bb746f-2bb2-7554-2d6f-726568705327");
+              return radioService.getCharacteristic("0xFFE1");
             })
             .then(characteristic => {
               console.log('> Found TX Power characteristic');
@@ -301,13 +298,13 @@
             })
             .then(() => {
               // Get robot service
-              return gattServer.getPrimaryService("22bb746f-2ba0-7554-2d6f-726568705327")
+              return gattServer.getPrimaryService("0xFFE0")
             })
             .then(service => {
               // Commands are sent to the robot service
               robotService = service;
               // Get Control characteristic
-              return robotService.getCharacteristic("22bb746f-2ba1-7554-2d6f-726568705327");
+              return robotService.getCharacteristic("0xFFE1");
             })
             .then(characteristic => {
               console.log('> Found Control characteristic');
